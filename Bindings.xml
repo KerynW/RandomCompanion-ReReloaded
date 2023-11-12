@@ -1,0 +1,26 @@
+<Bindings>
+	<Binding name="RANDOMCOMPANION_MOUNT" description="Choose a random mount" header="RANDOMCOMPANION">
+		RandomCompanion.Mount();
+	</Binding>
+	<Binding name="RANDOMCOMPANION_MOUNT_GROUND" description="Choose a random ground mount">
+		RandomCompanion.Mount("ground");
+	</Binding>
+	<Binding name="RANDOMCOMPANION_MOUNT_FLYING" description="Choose a random flying mount">
+		RandomCompanion.Mount("flying");
+	</Binding>
+	<Binding name="RANDOMCOMPANION_MOUNT_PASSENGER" description="Choose a random passenger mount">
+		RandomCompanion.Mount("passenger");
+	</Binding>
+	<Binding name="RANDOMCOMPANION_MOUNT_AQUATIC" description="Choose a random aquatic mount">
+		RandomCompanion.Mount("aquatic");
+	</Binding>
+	<Binding name="RANDOMCOMPANION_MOUNT_WATERWALKING" description="Choose a random waterwalking mount">
+		RandomCompanion.Mount("waterwalking");
+	</Binding>
+	<Binding name="RANDOMCOMPANION_PET_SUMMON" description="Choose a random vanity pet">
+		RandomCompanion.Pet();
+	</Binding>
+	<Binding name="RANDOMCOMPANION_PET_DISMISS" description="Dismiss your vanity pet">
+		RandomCompanion.PetDismiss();
+	</Binding>
+</Bindings>

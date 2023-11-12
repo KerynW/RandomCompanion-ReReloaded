@@ -1,0 +1,11 @@
+## Interface: 90001
+## Title : RandomCompanion_Reloaded
+## Version: 1.13
+## Notes: Choose a random mount or vanity pet
+## Author: DenL
+## SavedVariables: RandomCompanion_Settings
+
+Constants.lua
+RandomCompanion.lua
+RandomCompanionOptions.lua
+RandomCompanionTest.lua
