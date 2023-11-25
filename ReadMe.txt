@@ -1,6 +1,4 @@
-ReadMe.txt
-
-Random Companion Reloaded, updated for 10.2
+Fan version of Random Companion Reloaded, updated for 10.2
 
 IMPORTANT:  The slash command is now "/rcp" not "/rc" because the latter is in use for readychecks.
 
