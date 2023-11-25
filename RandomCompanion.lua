@@ -147,10 +147,10 @@ function RandomCompanion.LoadMounts()
         passengerflyingonground = {};
         aquatic = {};
         aquaticslow = {};
-        waterwalking = {};
         vashjir = {};
         qiraji = {};
         lowlevel = {};
+		advflying = {};
 
         bySpellID = {};
         all = {};
@@ -174,30 +174,44 @@ function RandomCompanion.LoadMounts()
                 mountID = mountID;
                 weight = weight;
             }
-            
+
             RandomCompanion.mounts.bySpellID[spellid] = mountdata;
 			table.insert(RandomCompanion.mounts.all, mountdata);
 
-            --[[https://wow.gamepedia.com/API_C_MountJournal.GetMountInfoExtraByID
+            --[[https://warcraft.wiki.gg/wiki/API_C_MountJournal.GetMountInfoExtra
                 230 for most ground mounts
                 231 for  [Riding Turtle] and  [Sea Turtle]
                 232 for  [Vashj'ir Seahorse] (was named Abyssal Seahorse prior to Warlords of Draenor)
                 241 for Blue, Green, Red, and Yellow Qiraji Battle Tank (restricted to use inside Temple of Ahn'Qiraj)
-                242 for Swift Spectral Gryphon (hidden in the mount journal, used while dead in certain zones)
+                242 for Spectral mounts (hidden in the mount journal, used while dead in certain zones)
                 247 for Red Flying Cloud
                 248 for most flying mounts, including those that change capability based on riding skill
-                254 for Subdued Seahorse,  [Brinedeep Bottom-Feeder] and  [Fathom Dweller]
-                269 for Azure and Crimson Water Strider
-                284 for Chauffeured Mekgineer's Chopper and Chauffeured Mechano-Hog
+                284 for Chauffeured Mekgineer's Chopper and Chauffeured Mechano-Hog ("LowLevel")
+				398 for Kuafon, which starts as ground-only and then learns to fly. Handled as flying
+				402 for Advanced Flying (Dragonriding) mounts.
+				407 for mounts that are both aquatic and flying ("Aquafly") including Aurelids, Ottuk Carrier, and Wavewhisker
+				408 for very slow helicid mount useable by low levels ("Slowsnail")
+				412 for Ottuks and other mounts that are both aquatic and ground mounts. ("Ottuk")
+				424 for the other category of flying mounts  ("Drake")  These may be slated for advanced flying
+				
             ]]
 
             local _, _, _, _, mountType = C_MountJournal.GetMountInfoExtraByID(mountID);
             local flyingOnGround = RandomCompanion.GetFlyingOnGround(companionID);
             local passenger = RC_MOUNT_IDS.passenger[spellid];
 
+--			print("loading ".. companionID);
+--			if name == RC_TEMPNAME then
+--				print("located mount ".. mountType .. " " .. name);
+--			end
+            
+			-- advanced flying (dragonriding) mounts
+				
+			if mountType == RC_MOUNTTYPE_ADVFLYING then 
+				table.insert(RandomCompanion.mounts.advflying, mountdata);
+
             -- flying mounts
-            if mountType == RC_MOUNTTYPE_FLYING or mountType == RC_MOUNTTYPE_FLYINGCLOUD then
-                
+            elseif mountType == RC_MOUNTTYPE_FLYING or mountType == RC_MOUNTTYPE_FLYINGCLOUD or mountType == RC_MOUNTTYPE_DRAKE or mountType == RC_MOUNTTYPE_KUAFON or mountType == RC_MOUNTTYPE_AQUAFLY then
                 -- flying passenger mounts
                 if passenger then
                     if (flyingOnGround or RandomCompanion_Settings.AllFlyingOnGround) then
@@ -211,6 +225,9 @@ function RandomCompanion.LoadMounts()
                         table.insert(RandomCompanion.mounts.flyingonground, mountdata);
                     else
                         table.insert(RandomCompanion.mounts.flying, mountdata);
+						if mountType == RC_MOUNTTYPE_AQUAFLY then
+	                        table.insert(RandomCompanion.mounts.aquatic, mountdata);
+						end
                     end
                 end
 
@@ -219,12 +236,8 @@ function RandomCompanion.LoadMounts()
                 table.insert(RandomCompanion.mounts.aquaticslow, mountdata);
 
             -- aquatic mounts
-            elseif mountType == RC_MOUNTTYPE_AQUATIC then
+            elseif mountType == RC_MOUNTTYPE_AQUATIC or mountType == RC_MOUNTTYPE_TURTLE then
                 table.insert(RandomCompanion.mounts.aquatic, mountdata);
-
-            -- waterwalking mounts
-            elseif mountType == RC_MOUNTTYPE_WATERWALKING then
-                table.insert(RandomCompanion.mounts.waterwalking, mountdata);
 
             -- Vashj'ir Seahorse
             elseif mountType == RC_MOUNTTYPE_VASHJIR then
@@ -235,7 +248,7 @@ function RandomCompanion.LoadMounts()
                 table.insert(RandomCompanion.mounts.qiraji, mountdata);
 
             -- Chauffeured heirloom mounts
-            elseif mountType == RC_MOUNTTYPE_LOWLEVEL then
+            elseif mountType == RC_MOUNTTYPE_LOWLEVEL or mountType == RC_MOUNTTYPE_SLOWSNAIL then
                 table.insert(RandomCompanion.mounts.lowlevel, mountdata);
 
             -- default: ground mounts
@@ -243,9 +256,12 @@ function RandomCompanion.LoadMounts()
                 -- passengerground
                 if passenger then
                     table.insert(RandomCompanion.mounts.passengerground, mountdata);
-                -- ground
-                else
+                -- ground	
+				else
                     table.insert(RandomCompanion.mounts.ground, mountdata);
+					if mountType == RC_MOUNTTYPE_OTTUK then
+                        table.insert(RandomCompanion.mounts.aquatic, mountdata);
+					end
                 end
             end
         end
@@ -403,8 +419,12 @@ function RandomCompanion.Mount(cmd)
         local flyable = RandomCompanion.IsFlyable();
         mountlist = {};
 
+		-- Advanced Flying Mounts
+		if cmd == "advflying" then
+            AddToWeightedTable(mountlist, RandomCompanion.mounts.advflying);
+			
         -- Passenger mounts
-        if cmd == "passenger" then
+        elseif cmd == "passenger" then
             AddToWeightedTable(mountlist, RandomCompanion.mounts.passengerflyingonground);
             if flyable then
                 AddToWeightedTable(mountlist, RandomCompanion.mounts.passengerflying);
@@ -425,10 +445,6 @@ function RandomCompanion.Mount(cmd)
         elseif cmd == "ground" then
             AddToWeightedTable(mountlist, RandomCompanion.mounts.ground);
             AddToWeightedTable(mountlist, RandomCompanion.mounts.passengerground);
-
-        -- Waterwalking mounts
-        elseif cmd == "waterwalking" then
-            AddToWeightedTable(mountlist, RandomCompanion.mounts.waterwalking);
 
         -- Aquatic mounts
         elseif IsSwimming() or IsSubmerged() or cmd == "aquatic" then
@@ -1042,7 +1058,7 @@ function RandomCompanion.Slash(...)
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 RandomCompanion version " .. VERSION);
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp mount\" to choose a random mount");
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp mount ground\" to choose a random ground mount in a flyable zone");
-        DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp mount passenger\" or \"/rc mount passengerground\" to choose a mount that can carry passengers");
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp mount passenger\" or \"/rcp mount passengerground\" to choose a mount that can carry passengers");
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp pet\" to choose a random vanity pet");
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp autorecall\" to toggle automatically recalling your vanity pet after resurrecting, changing zones, or taking flight paths");
         DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00 \"/rcp randomrecall\" to toggle recalling a random vanity pet after resurrecting, changing zones, or taking flight paths");

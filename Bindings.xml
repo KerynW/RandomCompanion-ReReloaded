@@ -1,5 +1,5 @@
 <Bindings>
-	<Binding name="RANDOMCOMPANION_MOUNT" description="Choose a random mount" header="RANDOMCOMPANION">
+	<Binding name="RANDOMCOMPANION_MOUNT" description="Choose a random mount" header="RANDOM COMPANION">
 		RandomCompanion.Mount();
 	</Binding>
 	<Binding name="RANDOMCOMPANION_MOUNT_GROUND" description="Choose a random ground mount">
@@ -14,7 +14,7 @@
 	<Binding name="RANDOMCOMPANION_MOUNT_AQUATIC" description="Choose a random aquatic mount">
 		RandomCompanion.Mount("aquatic");
 	</Binding>
-	<Binding name="RANDOMCOMPANION_MOUNT_WATERWALKING" description="Choose a random waterwalking mount">
+	<Binding name="RANDOMCOMPANION_MOUNT_ADVFLYING" description="Choose a random advanced flying mount">
 		RandomCompanion.Mount("waterwalking");
 	</Binding>
 	<Binding name="RANDOMCOMPANION_PET_SUMMON" description="Choose a random vanity pet">
